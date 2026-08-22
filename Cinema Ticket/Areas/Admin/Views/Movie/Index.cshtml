@@ -1,0 +1,482 @@
+﻿```cshtml
+@model IEnumerable<Cinema_Ticket.Models.Movie>
+
+@{
+    ViewData["Title"] = "Movies";
+
+    int currentPage = ViewBag.CurrentPage ?? 1;
+    int totalPages = ViewBag.TotalPages ?? 1;
+
+    string search = ViewBag.Search ?? "";
+
+    int? actorId = ViewBag.ActorId;
+    int? categoryId = ViewBag.CategoryId;
+    int? cinemaId = ViewBag.CinemaId;
+}
+
+<div class="container mt-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <h2>
+            <i class="bi bi-film"></i>
+            Movies
+        </h2>
+
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i>
+            Create Movie
+        </a>
+
+    </div>
+
+
+    <!-- Search -->
+    <div class="card shadow mb-4">
+
+        <div class="card-body">
+
+            <form asp-action="Index" method="get">
+
+                <div class="row g-2">
+
+                    <!-- Text Search -->
+                    <div class="col-md-3">
+
+                        <input type="text"
+                               name="search"
+                               value="@search"
+                               class="form-control"
+                               placeholder="Search..." />
+
+                    </div>
+
+
+                    <!-- Actor -->
+                    <div class="col-md-3">
+
+                        <select name="actorId"
+                                class="form-select">
+
+                            <option value="">
+                                -- All Actors --
+                            </option>
+
+                            @foreach (var actor in ViewBag.Actors)
+                            {
+                                if (actorId == actor.ID)
+                                {
+                                    <option value="@actor.ID" selected>
+                                        @actor.Name
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@actor.ID">
+                                        @actor.Name
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Category -->
+                    <div class="col-md-2">
+
+                        <select name="categoryId"
+                                class="form-select">
+
+                            <option value="">
+                                -- All Categories --
+                            </option>
+
+                            @foreach (var category in ViewBag.Categories)
+                            {
+                                if (categoryId == category.Id)
+                                {
+                                    <option value="@category.Id" selected>
+                                        @category.Name
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@category.Id">
+                                        @category.Name
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Cinema -->
+                    <div class="col-md-2">
+
+                        <select name="cinemaId"
+                                class="form-select">
+
+                            <option value="">
+                                -- All Cinemas --
+                            </option>
+
+                            @foreach (var cinema in ViewBag.Cinemas)
+                            {
+                                if (cinemaId == cinema.Id)
+                                {
+                                    <option value="@cinema.Id" selected>
+                                        @cinema.Name
+                                    </option>
+                                }
+                                else
+                                {
+                                    <option value="@cinema.Id">
+                                        @cinema.Name
+                                    </option>
+                                }
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <!-- Search Button -->
+                    <div class="col-md-1">
+
+                        <button type="submit"
+                                class="btn btn-primary w-100">
+
+                            <i class="bi bi-search"></i>
+
+                        </button>
+
+                    </div>
+
+
+                    <!-- Clear -->
+                    <div class="col-md-1">
+
+                        <a asp-action="Index"
+                           class="btn btn-secondary w-100">
+
+                            <i class="bi bi-x-circle"></i>
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- Movies -->
+    <div class="card shadow">
+
+        <div class="card-body">
+
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-bordered table-hover align-middle">
+
+                        <thead class="table-dark">
+
+                            <tr>
+
+                                <th>Image</th>
+
+                                <th>Name</th>
+
+                                <th>Description</th>
+
+                                <th>Price</th>
+
+                                <th>Duration</th>
+
+                                <th>Release Date</th>
+
+                                <th>Category</th>
+
+                                <th>Cinema</th>
+
+                                <th>Actors</th>
+
+                                <th>Actions</th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            @foreach (var movie in Model)
+                            {
+                                <tr>
+
+                                    <!-- Image -->
+                                    <td>
+
+                                        @if (!string.IsNullOrEmpty(movie.MainImg))
+                                        {
+                                            <img src="~/uploadsFile/@movie.MainImg"
+                                                 width="70"
+                                                 height="70"
+                                                 class="rounded"
+                                                 style="object-fit:cover;" />
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                No Image
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- Name -->
+                                    <td>
+                                        <strong>
+                                            @movie.Name
+                                        </strong>
+                                    </td>
+
+
+                                    <!-- Description -->
+                                    <td>
+
+                                        @if (!string.IsNullOrEmpty(movie.Description))
+                                        {
+                                            if (movie.Description.Length > 40)
+                                            {
+                                                @movie.Description.Substring(0, 40)
+                                                <span>...</span>
+                                            }
+                                            else
+                                            {
+                                                @movie.Description
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                No Description
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- Price -->
+                                    <td>
+                                        @movie.Price
+                                    </td>
+
+
+                                    <!-- Duration -->
+                                    <td>
+                                        @movie.Duration min
+                                    </td>
+
+
+                                    <!-- Release Date -->
+                                    <td>
+                                        @movie.ReleaseDate.ToString("yyyy-MM-dd")
+                                    </td>
+
+
+                                    <!-- Category -->
+                                    <td>
+                                        @movie.Category?.Name
+                                    </td>
+
+
+                                    <!-- Cinema -->
+                                    <td>
+                                        @movie.Cinema?.Name
+                                    </td>
+
+
+                                    <!-- Actors -->
+                                    <td>
+
+                                        @if (movie.MovieActors != null &&
+                                             movie.MovieActors.Any())
+                                        {
+                                            foreach (var movieActor in movie.MovieActors)
+                                            {
+                                                <span class="badge bg-info text-dark me-1 mb-1">
+                                                    @movieActor.Actor?.Name
+                                                </span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">
+                                                No Actors
+                                            </span>
+                                        }
+
+                                    </td>
+
+
+                                    <!-- Actions -->
+                                    <td>
+
+                                        <div class="d-flex gap-1">
+
+                                            <a asp-action="Edit"
+                                               asp-route-id="@movie.Id"
+                                               class="btn btn-warning btn-sm">
+                                                <i class="bi bi-pencil"></i>
+                                                Edit
+                                            </a>
+
+                                            <a asp-action="Details"
+                                               asp-route-id="@movie.Id"
+                                               class="btn btn-info btn-sm">
+                                                <i class="bi bi-eye"></i>
+                                                Details
+                                            </a>
+
+                                            <a asp-action="Delete"
+                                               asp-route-id="@movie.Id"
+                                               class="btn btn-danger btn-sm">
+                                                <i class="bi bi-trash"></i>
+                                                Delete
+                                            </a>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- Pagination -->
+
+                @if (totalPages > 1)
+                {
+                    <nav class="mt-4">
+
+                        <ul class="pagination justify-content-center">
+
+                            <!-- Previous -->
+
+                            @if (currentPage > 1)
+                            {
+                                <li class="page-item">
+
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-page="@(currentPage - 1)"
+                                       asp-route-search="@search"
+                                       asp-route-actorId="@actorId"
+                                       asp-route-categoryId="@categoryId"
+                                       asp-route-cinemaId="@cinemaId">
+
+                                        Previous
+
+                                    </a>
+
+                                </li>
+                            }
+
+
+                            <!-- Pages -->
+
+                            @for (int i = 1; i <= totalPages; i++)
+                            {
+                                <li class="page-item @(i == currentPage ? "active" : "")">
+
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-page="@i"
+                                       asp-route-search="@search"
+                                       asp-route-actorId="@actorId"
+                                       asp-route-categoryId="@categoryId"
+                                       asp-route-cinemaId="@cinemaId">
+
+                                        @i
+
+                                    </a>
+
+                                </li>
+                            }
+
+
+                            <!-- Next -->
+
+                            @if (currentPage < totalPages)
+                            {
+                                <li class="page-item">
+
+                                    <a class="page-link"
+                                       asp-action="Index"
+                                       asp-route-page="@(currentPage + 1)"
+                                       asp-route-search="@search"
+                                       asp-route-actorId="@actorId"
+                                       asp-route-categoryId="@categoryId"
+                                       asp-route-cinemaId="@cinemaId">
+
+                                        Next
+
+                                    </a>
+
+                                </li>
+                            }
+
+                        </ul>
+
+                    </nav>
+                }
+
+            }
+            else
+            {
+                <div class="text-center py-5">
+
+                    <i class="bi bi-film"
+                       style="font-size:50px;">
+                    </i>
+
+                    <h4 class="mt-3">
+                        No Movies Found
+                    </h4>
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary">
+
+                        Clear Filters
+
+                    </a>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+```

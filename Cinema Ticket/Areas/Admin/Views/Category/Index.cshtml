@@ -1,0 +1,176 @@
+﻿@model IEnumerable<Cinema_Ticket.Models.Category>
+
+<div class="container mt-4">
+
+    <!-- Header -->
+    <div class="row mb-3 align-items-center">
+        <div class="col-md-6">
+            <h2 class="display-6">All Categories</h2>
+        </div>
+
+        <div class="col-md-6 text-md-end text-start mt-2 mt-md-0">
+            <a asp-area="Admin"
+               asp-controller="Category"
+               asp-action="Create"
+               class="btn btn-primary">
+
+                <i class="bi bi-plus-circle"></i>
+                Add Category
+
+            </a>
+        </div>
+    </div>
+
+
+    <!-- Categories Table -->
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <table class="table table-hover table-bordered align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Movies</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var category in Model)
+                        {
+                            <tr>
+
+                                <!-- Name -->
+                                <td>
+                                    @category.Name
+                                </td>
+
+                                <!-- Description -->
+                                <td>
+                                    @category.Description
+                                </td>
+
+                                <!-- Movies Count -->
+                                <td>
+                                    @category.Movies.Count()
+                                </td>
+
+                                <!-- Actions -->
+                                <td>
+
+                                    <!-- Edit -->
+                                    <a asp-area="Admin"
+                                       asp-controller="Category"
+                                       asp-action="Edit"
+                                       asp-route-id="@category.Id"
+                                       class="btn btn-sm btn-warning">
+
+                                        Edit
+
+                                    </a>
+
+
+                                    <!-- Details -->
+                                    <a asp-area="Admin"
+                                       asp-controller="Category"
+                                       asp-action="Details"
+                                       asp-route-id="@category.Id"
+                                       class="btn btn-sm btn-info">
+
+                                        Details
+
+                                    </a>
+
+
+                                    <!-- Delete -->
+                                    <a asp-area="Admin"
+                                       asp-controller="Category"
+                                       asp-action="Delete"
+                                       asp-route-id="@category.Id"
+                                       class="btn btn-sm btn-danger btn-delete">
+
+                                        Delete
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4" class="text-center">
+                                No Categories Found
+                            </td>
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+<!-- Delete Confirmation -->
+<script>
+
+    document.querySelectorAll(".btn-delete").forEach(button => {
+
+        button.addEventListener("click", function (e) {
+
+            // Stop normal link
+            e.preventDefault();
+
+            // Get Delete URL
+            const deleteUrl = this.getAttribute("href");
+
+            // Show confirmation
+            Swal.fire({
+
+                title: "Are you sure?",
+
+                text: "You won't be able to recover this category!",
+
+                icon: "warning",
+
+                showCancelButton: true,
+
+                confirmButtonColor: "#d33",
+
+                cancelButtonColor: "#6c757d",
+
+                confirmButtonText: "Yes, delete it!",
+
+                cancelButtonText: "Cancel"
+
+            }).then((result) => {
+
+                // If user confirms
+                if (result.isConfirmed) {
+
+                    window.location.href = deleteUrl;
+
+                }
+
+            });
+
+        });
+
+    });
+
+</script>

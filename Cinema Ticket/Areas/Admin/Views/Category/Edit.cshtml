@@ -1,0 +1,90 @@
+﻿@model Cinema_Ticket.Models.Category
+
+<div class="container mt-4">
+
+    <div class="row mb-3">
+        <div class="col">
+            <h2 class="display-6">Edit Category</h2>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form asp-area="Admin"
+                  asp-controller="Category"
+                  asp-action="Edit"
+                  method="post">
+
+                <!-- مهم جدًا: إرسال Id -->
+                <input type="hidden" asp-for="Id" />
+
+                <!-- Validation -->
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+                <!-- Name -->
+                <div class="mb-3">
+
+                    <label asp-for="Name" class="form-label">
+                        Category Name
+                    </label>
+
+                    <input asp-for="Name"
+                           class="form-control"
+                           placeholder="Enter category name" />
+
+                    <span asp-validation-for="Name"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <!-- Description -->
+                <div class="mb-3">
+
+                    <label asp-for="Description" class="form-label">
+                        Description
+                    </label>
+
+                    <textarea asp-for="Description"
+                              class="form-control"
+                              rows="4"
+                              placeholder="Enter category description"></textarea>
+
+                    <span asp-validation-for="Description"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex gap-2 mt-4">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <i class="fas fa-save me-1"></i>
+                        Save Changes
+
+                    </button>
+
+                    <a asp-area="Admin"
+                       asp-controller="Category"
+                       asp-action="Index"
+                       class="btn btn-secondary">
+
+                        <i class="fas fa-times me-1"></i>
+                        Cancel
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
