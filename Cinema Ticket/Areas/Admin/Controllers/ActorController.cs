@@ -1,135 +1,151 @@
-﻿using System.Diagnostics.Eventing.Reader;
-using Cinema_Ticket.DataAccess;
-using Cinema_Ticket.Models;
+﻿using Cinema_Ticket.Models;
+using Cinema_Ticket.Repositories;
 using Cinema_Ticket.services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Cinema_Ticket.Areas.Admin.Controllers
 {
-
-
     [Area("Admin")]
     public class ActorController : Controller
     {
-        private readonly ApplicationDBcContext _context = new ApplicationDBcContext();
+        private readonly IRepository<Actor> _repository;
 
-        public IActionResult Index()
+        public ActorController(IRepository<Actor> repository)
         {
-
-
-
-
-            return View(_context.actors.ToList());
-
+            _repository = repository;
         }
 
+        // GET: Admin/Actor
+        public async Task<IActionResult> Index()
+        {
+            var actors = await _repository.GetAllAsync(
+                IsTraked: false);
 
+            return View(actors);
+        }
+
+        // GET: Admin/Actor/Create
         public IActionResult Create()
         {
             return View();
-
         }
 
+        // POST: Admin/Actor/Create
         [HttpPost]
-        public IActionResult Create(Actor actor, IFormFile Imagefile)
-
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(
+            Actor actor,
+            IFormFile? Imagefile)
         {
-
-            if (actor != null && Imagefile.Length > 0)
+            if (actor == null)
             {
+                return View(actor);
+            }
 
+            if (Imagefile != null && Imagefile.Length > 0)
+            {
                 actor.Img = Imag.Createfile(Imagefile);
-                //return View(cinema);
+            }
 
-                _context.actors.Add(actor);
-                _context.SaveChanges();
+            await _repository.InsertAsync(actor);
+            await _repository.CommitAsync();
 
-                return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
+        }
 
+        // GET: Admin/Actor/Edit/5
+        public async Task<IActionResult> Edit(int id)
+        {
+            var actor = await _repository.GetOneAsync(
+                x => x.ID == id);
+
+            if (actor == null)
+            {
+                return NotFound();
             }
 
             return View(actor);
-
-
         }
 
-
-
-
-
-
-
-
-        public IActionResult Edit(int id)
-
-        {
-
-            var actor = _context.actors.FirstOrDefault(x => x.ID == id);
-
-
-            return View(actor);
-        }
+        // POST: Admin/Actor/Edit
         [HttpPost]
-        public IActionResult Edit(Actor actor, IFormFile ImageFile)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(
+            Actor actor,
+            IFormFile? ImageFile)
         {
-            var oldActor = _context.actors
-                .AsNoTracking()
-                .FirstOrDefault(x => x.ID == actor.ID);
-
-            if (actor != null)
+            if (actor == null)
             {
-                if (oldActor == null)
-                {
-                    return NotFound();
-                }
+                return View(actor);
+            }
 
-                if (ImageFile != null && ImageFile.Length > 0)
+            var oldActor = await _repository.GetOneAsync(
+                x => x.ID == actor.ID);
+
+            if (oldActor == null)
+            {
+                return NotFound();
+            }
+
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                if (!string.IsNullOrEmpty(oldActor.Img))
                 {
                     Imag.deletefile(oldActor.Img);
-
-                    actor.Img = Imag.Createfile(ImageFile);
-                }
-                else
-                {
-                    // لو مفيش صورة جديدة، احتفظ بالصورة القديمة
-                    actor.Img = oldActor.Img;
                 }
 
-                _context.actors.Update(actor);
-                _context.SaveChanges();
+                actor.Img = Imag.Createfile(ImageFile);
+            }
+            else
+            {
+                actor.Img = oldActor.Img;
+            }
 
-                return RedirectToAction("Index");
+            _repository.Update(actor);
+
+            await _repository.CommitAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Admin/Actor/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            var actor = await _repository.GetOneAsync(
+                x => x.ID == id,
+                IsTraked: false);
+
+            if (actor == null)
+            {
+                return NotFound();
             }
 
             return View(actor);
         }
 
-
-
-        public IActionResult Details(int id)
+        // POST: Admin/Actor/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
-            return View(_context.actors.FirstOrDefault(a => a.ID == id));
-        }
+            var actor = await _repository.GetOneAsync(
+                x => x.ID == id);
 
+            if (actor == null)
+            {
+                return NotFound();
+            }
 
+            if (!string.IsNullOrEmpty(actor.Img))
+            {
+                Imag.deletefile(actor.Img);
+            }
 
+            _repository.Delete(actor);
 
+            await _repository.CommitAsync();
 
-
-
-
-        public IActionResult Delete(int id)
-        {
-
-
-            var Actor = _context.actors.Find(id);
-            _context.actors.Remove(Actor);
-            _context.SaveChanges();
-
-
-
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
     }
 }

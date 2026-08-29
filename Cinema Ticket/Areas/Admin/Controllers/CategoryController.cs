@@ -1,66 +1,66 @@
-﻿using Cinema_Ticket.DataAccess;
-using Cinema_Ticket.Models;
+﻿using Cinema_Ticket.Models;
+using Cinema_Ticket.Repositories;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace Cinema_Ticket.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class CategoryController : Controller
     {
+        private readonly IRepository<Category> _repository;
 
-        private readonly ApplicationDBcContext _dbContext = new ApplicationDBcContext();
-
-        public IActionResult Index()
+        public CategoryController(IRepository<Category> repository)
         {
-
-
-
-            return View(_dbContext.categories.Include(c=>c.Movies).ToList());
+            _repository = repository;
         }
 
+        // GET: Admin/Category
+        public async Task<IActionResult> Index()
+        {
+            var categories = await _repository.GetAllAsync(
+                includes: new[]
+                {
+                    (System.Linq.Expressions.Expression<Func<Category, object>>)
+                        (c => c.Movies)
+                },
+                IsTraked: false);
 
+            return View(categories);
+        }
+
+        // GET: Admin/Category/Create
         public IActionResult Create()
-
         {
-            return View(); 
+            return View();
         }
 
+        // POST: Admin/Category/Create
         [HttpPost]
-        public IActionResult Create(Category newCategory )
-
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Category newCategory)
         {
-
-            if (newCategory != null)
+            if (newCategory == null)
             {
-
-                _dbContext.categories.Add(newCategory);
-                _dbContext.SaveChanges();
+                return View(newCategory);
             }
-            return RedirectToAction("Index");
+
+            await _repository.InsertAsync(newCategory);
+            await _repository.CommitAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
-
-
-        public IActionResult Details(int id)
+        // GET: Admin/Category/Details/5
+        public async Task<IActionResult> Details(int id)
         {
-
-
-
-            return View(_dbContext.categories.FirstOrDefault(c => c.Id == id));
-        
-        }
-
-
-
-
-
-
-
-        public IActionResult Edit(int id)
-        {
-            var category = _dbContext.categories
-                .FirstOrDefault(x => x.Id == id);
+            var category = await _repository.GetOneAsync(
+                c => c.Id == id,
+                includes: new[]
+                {
+                    (System.Linq.Expressions.Expression<Func<Category, object>>)
+                        (c => c.Movies)
+                },
+                IsTraked: false);
 
             if (category == null)
             {
@@ -70,42 +70,66 @@ namespace Cinema_Ticket.Areas.Admin.Controllers
             return View(category);
         }
 
-        [HttpPost]
-        [HttpPost]
-        public IActionResult Edit(Category Newcategory)
+        // GET: Admin/Category/Edit/5
+        public async Task<IActionResult> Edit(int id)
         {
-            var category = _dbContext.categories
-                .FirstOrDefault(x => x.Id == Newcategory.Id);
+            var category = await _repository.GetOneAsync(
+                x => x.Id == id);
 
             if (category == null)
             {
                 return NotFound();
             }
 
-            category.Name = Newcategory.Name;
-            category.Description = Newcategory.Description;
+            return View(category);
+        }
 
-            _dbContext.SaveChanges();
+        // POST: Admin/Category/Edit
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Category newCategory)
+        {
+            if (newCategory == null)
+            {
+                return View(newCategory);
+            }
+
+            var category = await _repository.GetOneAsync(
+                x => x.Id == newCategory.Id);
+
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            category.Name = newCategory.Name;
+            category.Description = newCategory.Description;
+
+            _repository.Update(category);
+
+            await _repository.CommitAsync();
 
             return RedirectToAction(nameof(Index));
         }
 
-
-
-        public IActionResult Delete(int id)
+        // POST: Admin/Category/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
+            var category = await _repository.GetOneAsync(
+                x => x.Id == id);
 
+            if (category == null)
+            {
+                return NotFound();
+            }
 
+            _repository.Delete(category);
 
-            Category Ncategory = _dbContext.categories.Find(id);
-            _dbContext.categories.Remove(Ncategory);
-            _dbContext.SaveChanges();
+            await _repository.CommitAsync();
 
-            return  RedirectToAction("index");
+            return RedirectToAction(nameof(Index));
         }
-
-
-
     }
 }
-

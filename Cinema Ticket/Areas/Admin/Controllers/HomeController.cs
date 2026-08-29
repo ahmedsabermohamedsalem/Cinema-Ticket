@@ -1,28 +1,50 @@
-﻿using Cinema_Ticket.DataAccess;
+﻿using Cinema_Ticket.Models;
+using Cinema_Ticket.Repositories;
 using Cinema_Ticket.Viewmodel;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cinema_Ticket.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class HomeController : Controller
     {
+        private readonly IRepository<Category> _categoryRepository;
+        private readonly IRepository<Cinema> _cinemaRepository;
+        private readonly IRepository<Actor> _actorRepository;
+        private readonly IRepository<Movie> _movieRepository;
 
-        private readonly ApplicationDBcContext _context = new ApplicationDBcContext();
-
-
-        [Area("Admin")]
-        public IActionResult Index()
+        public HomeController(
+            IRepository<Category> categoryRepository,
+            IRepository<Cinema> cinemaRepository,
+            IRepository<Actor> actorRepository,
+            IRepository<Movie> movieRepository)
         {
+            _categoryRepository = categoryRepository;
+            _cinemaRepository = cinemaRepository;
+            _actorRepository = actorRepository;
+            _movieRepository = movieRepository;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var categories = await _categoryRepository.GetAllAsync(
+                IsTraked: false);
+
+            var cinemas = await _cinemaRepository.GetAllAsync(
+                IsTraked: false);
+
+            var actors = await _actorRepository.GetAllAsync(
+                IsTraked: false);
+
+            var movies = await _movieRepository.GetAllAsync(
+                IsTraked: false);
 
             DashBordVm vm = new DashBordVm()
             {
-                CountCategory = _context.categories.Count(),
-                CountCinema = _context.cinemas.Count(),
-                CountActoor = _context.actors.Count(),
-                CountMovies = _context.Movies.Count()
-
-
-
+                CountCategory = categories.Count(),
+                CountCinema = cinemas.Count(),
+                CountActoor = actors.Count(),
+                CountMovies = movies.Count()
             };
 
             return View(vm);

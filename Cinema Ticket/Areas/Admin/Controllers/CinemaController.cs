@@ -1,5 +1,5 @@
-﻿using Cinema_Ticket.DataAccess;
-using Cinema_Ticket.Models;
+﻿using Cinema_Ticket.Models;
+using Cinema_Ticket.Repositories;
 using Cinema_Ticket.services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,26 +8,58 @@ namespace Cinema_Ticket.Areas.Admin.Controllers
     [Area("Admin")]
     public class CinemaController : Controller
     {
-        private readonly ApplicationDBcContext _context = new ApplicationDBcContext();
+        private readonly IRepository<Cinema> _repository;
 
-        
-        public IActionResult Index()
+        public CinemaController(IRepository<Cinema> repository)
         {
-            var cinemas = _context.cinemas.ToList();
+            _repository = repository;
+        }
+
+        // GET: Admin/Cinema
+        public async Task<IActionResult> Index()
+        {
+            var cinemas = await _repository.GetAllAsync(
+                IsTraked: false);
 
             return View(cinemas);
         }
 
+        // GET: Admin/Cinema/Create
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-
-        public IActionResult Details(int id)
+        // POST: Admin/Cinema/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(
+            Cinema cinema,
+            IFormFile? ImageFile)
         {
-            var cinema = _context.cinemas.FirstOrDefault(c => c.Id == id);
+            if (cinema == null)
+            {
+                return View(cinema);
+            }
+
+            if (ImageFile != null && ImageFile.Length > 0)
+            {
+                cinema.Img = Imag.Createfile(ImageFile);
+            }
+
+            await _repository.InsertAsync(cinema);
+            await _repository.CommitAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Admin/Cinema/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            var cinema = await _repository.GetOneAsync(
+                c => c.Id == id,
+                IsTraked: false);
 
             if (cinema == null)
             {
@@ -37,41 +69,35 @@ namespace Cinema_Ticket.Areas.Admin.Controllers
             return View(cinema);
         }
 
-
-        [HttpPost]
-
-        public IActionResult Create(Cinema cinema, IFormFile ImageFile)
+        // GET: Admin/Cinema/Edit/5
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
         {
-            if (cinema != null && ImageFile.Length > 0)
+            var cinema = await _repository.GetOneAsync(
+                c => c.Id == id);
+
+            if (cinema == null)
             {
-
-                cinema.Img = Imag.Createfile(ImageFile);
-                //return View(cinema);
-
-                _context.cinemas.Add(cinema);
-                _context.SaveChanges();
-
-                return RedirectToAction("Index");
-
-                          }
-
-
+                return NotFound();
+            }
 
             return View(cinema);
         }
 
-        public IActionResult Edit( int id)
-        {
-
-
-
-
-            return View(_context.cinemas.FirstOrDefault(x=> x.Id==id));
-        }
+        // POST: Admin/Cinema/Edit
         [HttpPost]
-        public IActionResult Edit(Cinema cinema, IFormFile ImageFile)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(
+            Cinema cinema,
+            IFormFile? ImageFile)
         {
-            var oldCinema = _context.cinemas.Find(cinema.Id);
+            if (cinema == null)
+            {
+                return View(cinema);
+            }
+
+            var oldCinema = await _repository.GetOneAsync(
+                c => c.Id == cinema.Id);
 
             if (oldCinema == null)
             {
@@ -81,66 +107,50 @@ namespace Cinema_Ticket.Areas.Admin.Controllers
             oldCinema.Name = cinema.Name;
             oldCinema.Description = cinema.Description;
 
-            // If user uploaded a new image
-            if (ImageFile != null)
+            // صورة جديدة
+            if (ImageFile != null && ImageFile.Length > 0)
             {
-                // Save the old image name BEFORE changing it
-                var oldImageName = oldCinema.Img;
-
-                // Delete old image
-                if (!string.IsNullOrEmpty(oldImageName))
+                // حذف الصورة القديمة
+                if (!string.IsNullOrEmpty(oldCinema.Img))
                 {
-                    var oldImagePath = Path.Combine(
-                        Directory.GetCurrentDirectory(),
-                        "wwwroot",
-                        "uploadsFile",
-                        oldImageName
-                    );
-
-                    if (System.IO.File.Exists(oldImagePath))
-                    {
-                        System.IO.File.Delete(oldImagePath);
-                    }
+                    Imag.deletefile(oldCinema.Img);
                 }
 
-                // Save new image
+                // حفظ الصورة الجديدة
                 oldCinema.Img = Imag.Createfile(ImageFile);
             }
 
-            _context.cinemas.Update(oldCinema);
-            _context.SaveChanges();
+            _repository.Update(oldCinema);
 
-            return RedirectToAction("Index");
+            await _repository.CommitAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Delete(int id)
+        // POST: Admin/Cinema/Delete/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(int id)
         {
+            var cinema = await _repository.GetOneAsync(
+                c => c.Id == id);
 
+            if (cinema == null)
+            {
+                return NotFound();
+            }
 
-            var cinema = _context.cinemas.Find(id);
-            _context.cinemas.Remove(cinema);
-            _context.SaveChanges();
+            // حذف صورة السينما
+            if (!string.IsNullOrEmpty(cinema.Img))
+            {
+                Imag.deletefile(cinema.Img);
+            }
 
+            _repository.Delete(cinema);
 
+            await _repository.CommitAsync();
 
-            return RedirectToAction("Index");
+            return RedirectToAction(nameof(Index));
         }
-
     }
-
-           
-
-
-
-
-
-
-
-
-         
-
-    
-   
-
 }
-
