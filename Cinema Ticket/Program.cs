@@ -2,7 +2,9 @@ using Cinema_Ticket.DataAccess;
 using Cinema_Ticket.Models;
 using Cinema_Ticket.Repositories;
 using Cinema_Ticket.services;
-
+using Ecommerce531.Utilities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Cinema_Ticket
@@ -15,7 +17,22 @@ namespace Cinema_Ticket
 
             builder.Services.AddControllersWithViews();
 
-          
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            {
+                // User Settings
+                options.User.RequireUniqueEmail = true;
+
+                // Password Settings
+                options.Password.RequiredLength = 6;
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireNonAlphanumeric = false;
+                options.SignIn.RequireConfirmedEmail = true;
+            })
+              .AddEntityFrameworkStores<ApplicationDBcContext>()
+              .AddDefaultTokenProviders();
+
 
             builder.Services.AddDbContext<ApplicationDBcContext>(
                 options =>
@@ -31,8 +48,11 @@ namespace Cinema_Ticket
             builder.Services.AddScoped<IRepository<Movie>, Repository<Movie>>();
             builder.Services.AddScoped<IRepository<MovieActor>, Repository<MovieActor>>();
             builder.Services.AddScoped<IRepository<MovieImage>, Repository<MovieImage>>();
+            builder.Services.AddScoped<IRepository<ApplicationUserOtp>, Repository<ApplicationUserOtp>>();
 
-          
+            builder.Services.AddTransient<IEmailSender, EmailSender>();
+            
+
             var app = builder.Build();
 
 
@@ -53,7 +73,7 @@ namespace Cinema_Ticket
 
             app.MapControllerRoute(
                 name: "default",
-                pattern: "{area=Admin}/{controller=Home}/{action=Index}/{id?}")
+                pattern: "{area=Identity }/{controller=Acoount}/{action=login}/{id?}")
                 .WithStaticAssets();
 
             app.Run();

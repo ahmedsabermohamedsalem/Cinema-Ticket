@@ -8,6 +8,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\Identity\Data\**" />
+    <Compile Remove="Areas\Identity\Models\**" />
+    <Content Remove="Areas\Identity\Data\**" />
+    <Content Remove="Areas\Identity\Models\**" />
+    <EmbeddedResource Remove="Areas\Identity\Data\**" />
+    <EmbeddedResource Remove="Areas\Identity\Models\**" />
+    <None Remove="Areas\Identity\Data\**" />
+    <None Remove="Areas\Identity\Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="10.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="10.0.10">
@@ -17,6 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Areas\Identity\Controllers\" />
     <Folder Include="Views\Actor\" />
     <Folder Include="wwwroot\assets\" />
   </ItemGroup>

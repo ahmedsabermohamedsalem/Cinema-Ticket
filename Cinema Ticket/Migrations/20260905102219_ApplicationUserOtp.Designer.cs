@@ -4,6 +4,7 @@ using Cinema_Ticket.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Cinema_Ticket.Migrations
 {
     [DbContext(typeof(ApplicationDBcContext))]
-    partial class ApplicationDBcContextModelSnapshot : ModelSnapshot
+    [Migration("20260905102219_ApplicationUserOtp")]
+    partial class ApplicationUserOtp
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
