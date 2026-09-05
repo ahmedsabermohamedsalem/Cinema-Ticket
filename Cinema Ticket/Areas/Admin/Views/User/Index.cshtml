@@ -1,0 +1,125 @@
+﻿
+@using Cinema_Ticket.Utilities.DBSeeder
+
+@model IEnumerable<ApplicationUser>
+
+<div class="container">
+
+    <div class="row mb-3 align-items-center my-3">
+
+        <div class="col-md-6">
+            <h2 class="display-6">All Users</h2>
+        </div>
+
+        <div class="col-md-6 text-md-end text-start mt-2 mt-md-0">
+            <a href="/Admin/User/Create" class="btn btn-success">
+                Create User
+            </a>
+        </div>
+
+    </div>
+
+    <div class="row">
+
+        <div class="col-12">
+
+            <table class="table table-hover">
+
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">UserName</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Email Confirmed</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+
+                            <th scope="row">
+                                @item.Id
+                            </th>
+
+                            <td>
+                                @item.Name
+                            </td>
+
+                            <td>
+                                @item.UserName
+                            </td>
+
+                            <td>
+                                @item.Email
+                            </td>
+
+                            <td>
+
+                                @if (item.EmailConfirmed)
+                                {
+                                    <span class="badge text-bg-success">
+                                        Confirmed
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge text-bg-danger">
+                                        Not Confirmed
+                                    </span>
+                                }
+
+                            </td>
+
+                            <td>
+
+                                @if (User.IsInRole(CD.SUPER_ADMIN_ROLE) ||
+                                     User.IsInRole(CD.ADMIN_ROLE))
+                                {
+                                    @if (item.LockoutEnd == null ||
+                                         DateTime.UtcNow > item.LockoutEnd)
+                                    {
+                                        <a href="/Admin/User/LockUnLock/@item.Id"
+                                           class="btn btn-danger">
+                                            Lock
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a href="/Admin/User/LockUnLock/@item.Id"
+                                           class="btn btn-success">
+                                            Unlock
+                                        </a>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        No Actions!!!
+                                    </span>
+                                }
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+
+    <partial name="_NotificationPartial" />
+
+}

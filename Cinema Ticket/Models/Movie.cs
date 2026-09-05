@@ -35,5 +35,9 @@ namespace Cinema_Ticket.Models
 
         public ICollection<MovieImage> MovieImages { get; set; }
             = new List<MovieImage>();
+
+        public ICollection<Ticket> Tickets { get; set; }
+            = new List<Ticket>();
     }
+
 }

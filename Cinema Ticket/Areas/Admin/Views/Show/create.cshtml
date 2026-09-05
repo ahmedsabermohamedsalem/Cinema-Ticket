@@ -1,0 +1,96 @@
+﻿```cshtml
+@model Cinema_Ticket.Models.Show
+
+<div class="container mt-4">
+
+    <div class="row mb-3">
+        <div class="col">
+            <h2 class="display-6">Create Show</h2>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+
+            <form asp-area="Admin"
+                  asp-controller="Show"
+                  asp-action="Create"
+                  method="post">
+
+                <!-- Validation -->
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+                <!-- Start Date -->
+                <div class="mb-3">
+
+                    <label asp-for="StartDate"
+                           class="form-label">
+                        Start Date
+                    </label>
+
+                    <input asp-for="StartDate"
+                           type="datetime-local"
+                           class="form-control" />
+
+                    <span asp-validation-for="StartDate"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <!-- End Date -->
+                <div class="mb-3">
+
+                    <label asp-for="EndDate"
+                           class="form-label">
+                        End Date
+                    </label>
+
+                    <input asp-for="EndDate"
+                           type="datetime-local"
+                           class="form-control" />
+
+                    <span asp-validation-for="EndDate"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <!-- Buttons -->
+                <div class="d-flex gap-2 mt-4">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <i class="fas fa-save me-1"></i>
+                        Create
+
+                    </button>
+
+                    <a asp-area="Admin"
+                       asp-controller="Show"
+                       asp-action="Index"
+                       class="btn btn-secondary">
+
+                        <i class="fas fa-times me-1"></i>
+                        Cancel
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+```

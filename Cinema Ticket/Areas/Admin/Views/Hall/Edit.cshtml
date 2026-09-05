@@ -1,0 +1,128 @@
+﻿
+@model Cinema_Ticket.Models.Hall
+
+@{
+    ViewData["Title"] = "Edit Hall";
+}
+
+<div class="container mt-4">
+
+    <div class="card shadow">
+
+        <div class="card-header">
+            <h3 class="mb-0">
+                <i class="bi bi-building"></i>
+                Edit Hall
+            </h3>
+        </div>
+
+        <div class="card-body">
+
+            <form asp-action="Edit" method="post">
+
+                @Html.AntiForgeryToken()
+
+                <input asp-for="Id" type="hidden" />
+
+                <div asp-validation-summary="ModelOnly"
+                     class="text-danger mb-3">
+                </div>
+
+                <!-- Cinema -->
+                <div class="mb-3">
+
+                    <label asp-for="CinemaId" class="form-label">
+                        Cinema
+                    </label>
+
+                    <select asp-for="CinemaId"
+                            class="form-select">
+
+                        <option value="">
+                            -- Select Cinema --
+                        </option>
+
+                        @foreach (var cinema in ViewBag.Cinemas)
+                        {
+                            <option value="@cinema.Id">
+                                @cinema.Name
+                            </option>
+                        }
+
+                    </select>
+
+                    <span asp-validation-for="CinemaId"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <!-- Hall Name -->
+                <div class="mb-3">
+
+                    <label asp-for="Name" class="form-label">
+                        Hall Name
+                    </label>
+
+                    <input asp-for="Name"
+                           class="form-control"
+                           placeholder="Enter hall name" />
+
+                    <span asp-validation-for="Name"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <!-- Seat Count -->
+                <div class="mb-3">
+
+                    <label asp-for="SeatCount" class="form-label">
+                        Seat Count
+                    </label>
+
+                    <input asp-for="SeatCount"
+                           type="number"
+                           min="1"
+                           class="form-control"
+                           placeholder="Enter seat count" />
+
+                    <span asp-validation-for="SeatCount"
+                          class="text-danger">
+                    </span>
+
+                </div>
+
+                <!-- Buttons -->
+                <div class="mt-4">
+
+                    <button type="submit"
+                            class="btn btn-primary">
+
+                        <i class="bi bi-save"></i>
+                        Update
+
+                    </button>
+
+                    <a asp-action="Index"
+                       class="btn btn-secondary">
+
+                        <i class="bi bi-arrow-left"></i>
+                        Back
+
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

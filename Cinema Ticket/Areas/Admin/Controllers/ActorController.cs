@@ -1,11 +1,14 @@
 ﻿using Cinema_Ticket.Models;
 using Cinema_Ticket.Repositories;
 using Cinema_Ticket.services;
+using Cinema_Ticket.Utilities.DBSeeder;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Cinema_Ticket.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = $"{CD.SUPER_ADMIN_ROLE} , {CD.ADMIN_ROLE}  ,{CD.EMPLOYEE_ROLE} ")]
     public class ActorController : Controller
     {
         private readonly IRepository<Actor> _repository;

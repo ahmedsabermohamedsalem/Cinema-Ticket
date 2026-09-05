@@ -1,0 +1,144 @@
+﻿```cshtml
+@model Cinema_Ticket.Viewmodel.CreateTicketVM
+
+<div class="container mt-5">
+
+    <div class="card shadow">
+
+        <div class="card-header">
+            <h3>Book Ticket</h3>
+        </div>
+
+        <div class="card-body">
+
+            <!-- Movie -->
+            <div class="row mb-4">
+
+                <div class="col-md-3">
+                    <img src="~/uploadsFile/@Model.Movie.MainImg"
+                         class="img-fluid rounded"
+                         alt="@Model.Movie.Name"
+                         style="height:250px; width:100%; object-fit:cover;" />
+                </div>
+
+                <div class="col-md-9">
+
+                    <h2>@Model.Movie.Name</h2>
+
+                    <p>
+                        @Model.Movie.Description
+                    </p>
+
+                    <p>
+                        <strong>Duration:</strong>
+                        @Model.Movie.Duration min
+                    </p>
+
+                    <p>
+                        <strong>Price:</strong>
+                        @Model.Movie.Price EGP
+                    </p>
+
+                </div>
+
+            </div>
+
+            <hr />
+
+            <form asp-action="Create" method="post">
+
+                <!-- Movie Id -->
+                <input type="hidden" asp-for="MovieId" />
+
+                <!-- Hall -->
+                <div class="row mb-3">
+
+                    <div class="col-md-12">
+
+                        <label asp-for="HallId" class="form-label">
+                            Hall
+                        </label>
+
+                        <select asp-for="HallId"
+                                class="form-select">
+
+                            <option value="">
+                                -- Select Hall --
+                            </option>
+
+                            @foreach (var hall in Model.Halls)
+                            {
+                                <option value="@hall.Value">
+                                    @hall.Text
+                                </option>
+                            }
+
+                        </select>
+
+                        <span asp-validation-for="HallId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <!-- Show -->
+                <div class="row mb-3">
+
+                    <div class="col-md-12">
+
+                        <label asp-for="ShowId" class="form-label">
+                            Show Time
+                        </label>
+
+                        <select asp-for="ShowId"
+                                class="form-select">
+
+                            <option value="">
+                                -- Select Show Time --
+                            </option>
+
+                            @foreach (var show in Model.Shows)
+                            {
+                                <option value="@show.Value">
+                                    @show.Text
+                                </option>
+                            }
+
+                        </select>
+
+                        <span asp-validation-for="ShowId"
+                              class="text-danger">
+                        </span>
+
+                    </div>
+
+                </div>
+
+                <!-- Button -->
+                <div class="row mt-4">
+
+                    <div class="col-md-12">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Book Ticket
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+```
